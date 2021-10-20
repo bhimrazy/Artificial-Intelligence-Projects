@@ -26,3 +26,30 @@ def chunk_string_by_len(string: str, n: int = 3) -> List[str]:
     """
     return [string[i:i+n] for i in range(0, len(string), n)]
 
+
+
+            
+  
+def main(display_units:bool=False):
+    """This is the main function to do all the main functionalities.
+    Args:
+        display_units (bool, optional): A option to display units. Defaults to False.
+    """
+    boxes = cross(ROWS, COLS)
+    
+    row_units = [cross(r,COLS) for r in ROWS]
+    col_units = [cross(ROWS,c) for c in COLS]
+    square_units = [cross(r,c) for r in chunk_string_by_len(ROWS) for c in chunk_string_by_len(COLS)]
+    unit_list = row_units + col_units + square_units
+    
+    if display_units:
+        print(f"boxes : \n{boxes}\n")
+        print(f"row_units : \n{row_units}\n")
+        print(f"col_units : \n{col_units}\n")
+        print(f"square_units : \n{square_units}\n")
+        print(f"square_units : \n{unit_list}\n")
+    
+    
+if __name__ == "__main__":
+    
+    main()
