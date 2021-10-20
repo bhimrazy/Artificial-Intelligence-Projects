@@ -38,6 +38,19 @@ def grid_values(puzzle:str,boxes:List[str],replace:bool=True) -> Dict[str,str]:
     """
     return {key : ( '123456789' if value =='.' and replace else value) for key,value in zip(boxes,puzzle)}
 
+
+def find_peers(box:str,unit_list:List[List[str]]):
+    """This function returns the peers of box.
+    Args:
+        box (str): A box unit
+        unit_list (LList[List[str]]): A list of units
+    """
+    
+    peers_list=[list for list in unit_list if box in list]
+    peers = list(set([item for sub_list in peers_list for item in sub_list if item !=box]))
+    
+    return peers
+    
     
 def display_grid(p_values:Dict[str,str])  -> None:
     """This function displays the dictonary in proper grid format.
@@ -86,7 +99,9 @@ def main(display_units:bool=False):
     
     puzzle = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
     display_grid(grid_values(puzzle,boxes,replace=False)) #display original
-    
+    grid_units = grid_values(puzzle,boxes)
+    display_grid(grid_units) #display relaced
+    display_grid(eliminate(grid_units,unit_list)) #display eliminated
     
 if __name__ == "__main__":
     
