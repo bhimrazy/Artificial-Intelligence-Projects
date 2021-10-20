@@ -52,6 +52,22 @@ def find_peers(box:str,unit_list:List[List[str]]):
     return peers
     
     
+def eliminate(grids:Dict[str,str],unit_list:List[List[str]]):
+    """This function retuns dictionary with eliminated box values.
+    Args:
+        boxes (Dict[str,str]): A dictnary of box units
+        unit_list (List[List[str]]): A list of units
+    """
+    for key,value in grids.items():
+        if len(value) > 1:
+            peers = find_peers(key,unit_list)
+            peers_values = [grids.get(k) for k in peers if len(grids.get(k))==1]
+            for v in peers_values:
+                value=value.replace(v,"")
+            grids[key]=value
+    return grids
+
+    
 def display_grid(p_values:Dict[str,str])  -> None:
     """This function displays the dictonary in proper grid format.
     Args:
