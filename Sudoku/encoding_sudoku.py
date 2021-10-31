@@ -67,7 +67,7 @@ def display_sudoku(p_values:Dict[str,str])  -> None:
             pt='-'*(max_len*3) #tern
             print('+'.join([pt,pt,pt]),'\n')
             
-def find_peers(box:str,unit_list:List[List[str]]):
+def find_peers(box:str,unit_list:List[List[str]]) -> List[str]:
     """This function returns the peers of box.
     Args:
         box (str): A box unit
@@ -82,7 +82,7 @@ def find_peers(box:str,unit_list:List[List[str]]):
     return peers
     
     
-def eliminate(grids:Dict[str,str],unit_list:List[List[str]]):
+def eliminate(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
     """This function eliminates values from temporary box units(with values 1-9) if 
        that is present in single valued peers of that box.
     Args:
