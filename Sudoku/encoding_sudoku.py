@@ -186,4 +186,4 @@ def main(display_units:bool=False):
     
 if __name__ == "__main__":
     
-    main(display_units=False)
+    main()
