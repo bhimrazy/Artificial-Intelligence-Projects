@@ -80,8 +80,7 @@ def find_peers(box:str,unit_list:List[List[str]]) -> List[str]:
     peers_list=[list for list in unit_list if box in list]
     peers = list(set([item for sub_list in peers_list for item in sub_list if item !=box]))
     return peers
-    
-    
+     
 def eliminate(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
     """This function eliminates values from temporary box units(with values 1-9) if 
        that is present in single valued peers of that box.
@@ -119,7 +118,31 @@ def only_choice(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
                 grids[d_places[0]] = digit
     return grids
     
-            
+def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[str,str],bool]:
+    """This function reduces unsolved box units to single value with repeated elimination and reduction.
+
+    Args:
+        grids (Dict[str,str]): A dictionary of sudoku box units
+        unit_list (List[List[str]]): A list of units
+
+    Returns:
+        grids (Dict[str,str]): A dictionary of sudoku box units with replacing only values.
+        solved (bool) : A boolean value to indicate that puzzle is solved or not.
+    """
+    stalled = False
+    solved = False
+    while not stalled:
+        solved_values_before = len([value for value in grids.values() if len(value)==1])#total units with single value
+        grids = eliminate(grids, unit_list)
+        grids = only_choice(grids, unit_list)
+        solved_values_after = len([value for value in grids.values() if len(value)==1])#total units with single value
+        print(f'Before:{solved_values_before}\tAfter:{solved_values_after}')
+        stalled = solved_values_before == solved_values_after
+        
+    for unit in unit_list:
+        unit_values_sum = sum([int(grids.get(k)) for k in unit])
+        solved = unit_values_sum == 45
+    return grids,solved
   
 def main(display_units:bool=False):
     """This is the main function to do all the main functionalities.
@@ -155,6 +178,12 @@ def main(display_units:bool=False):
     print("\nSudoku with only choices.")
     elimination_with_only_coices_values=only_choice(eliminated_values,unit_list)
     display_sudoku(elimination_with_only_coices_values)
+    
+    print("\nSudoku with reduced puzzle.")
+    reduced_puzzle_values,solved=reduce_puzzle(eliminated_values,unit_list)
+    display_sudoku(reduced_puzzle_values)
+    
+    print(f'The SUDOKU is {"Solved" if solved else "UnSolved"}.')
     
 if __name__ == "__main__":
     
