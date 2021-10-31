@@ -101,8 +101,23 @@ def eliminate(grids:Dict[str,str],unit_list:List[List[str]]):
             grids[key]=value
     return grids
 
-def only_choice():
-    pass
+def only_choice(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
+    """This function replaces eliminated box units with only choice value
+       with in the unit.
+
+    Args:
+        grids (Dict[str,str]): A dictionary of sudoku box units
+        unit_list (List[List[str]]): A list of units
+
+    Returns:
+        grids (Dict[str,str]): A dictionary of sudoku box units with replacing only values.
+    """
+    for unit in unit_list:
+        for digit in '123456789':
+            d_places = [box for box in unit if digit in grids[box]]
+            if len(d_places) == 1:
+                grids[d_places[0]] = digit
+    return grids
     
             
   
@@ -138,8 +153,8 @@ def main(display_units:bool=False):
     display_sudoku(eliminated_values) #display eliminated
     
     print("\nSudoku with only choices.")
-    elimination_with_only_coices_values=only_choice(eliminated_values)
-    display_sudoku(elimination_with_only_coices_values,unit_list)
+    elimination_with_only_coices_values=only_choice(eliminated_values,unit_list)
+    display_sudoku(elimination_with_only_coices_values)
     
 if __name__ == "__main__":
     
