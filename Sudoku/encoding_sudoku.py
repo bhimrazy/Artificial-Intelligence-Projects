@@ -174,11 +174,11 @@ def main(display_units:bool=False):
     eliminated_values=eliminate(grid_units,unit_list)
     display_sudoku(eliminated_values) #display eliminated
     
-    print("\nSudoku with only choices.")
+    print("\nSudoku after replacing with only choices.")
     elimination_with_only_coices_values=only_choice(eliminated_values,unit_list)
     display_sudoku(elimination_with_only_coices_values)
     
-    print("\nSudoku with reduced puzzle.")
+    print("\nSudoku after Constraint Propagation.")
     reduced_puzzle_values,solved=reduce_puzzle(eliminated_values,unit_list)
     display_sudoku(reduced_puzzle_values)
     
