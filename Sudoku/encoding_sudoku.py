@@ -136,7 +136,6 @@ def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[s
         grids = eliminate(grids, unit_list)
         grids = only_choice(grids, unit_list)
         solved_values_after = len([value for value in grids.values() if len(value)==1])#total units with single value
-        print(f'Before:{solved_values_before}\tAfter:{solved_values_after}')
         stalled = solved_values_before == solved_values_after
         
     for unit in unit_list:
