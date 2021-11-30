@@ -1,31 +1,28 @@
 from typing import *
+from utils import cross,chunk_string_by_len
 
 ROWS = 'ABCDEFGHI'
 COLS = '123456789'
 
+boxes = cross(ROWS, COLS)
+row_units = [cross(r,COLS) for r in ROWS]
+col_units = [cross(ROWS,c) for c in COLS]
+square_units = [cross(r,c) for r in chunk_string_by_len(ROWS) for c in chunk_string_by_len(COLS)]
+unit_list = row_units + col_units + square_units
 
-def cross(row: str, col: str) -> List[str]:
-    """This function returns the list formed by 
-    all the possible concatenations of a letter r in string row with a letter c in string col.
+def get_puzzle(complex:bool = False) -> str:
+    """Returns puzzle with high or medium complexity.
+
     Args:
-        row (str): String of concatenated Characters
-        col (str): String of concatenated Numbers
+        complex (bool, optional):An option if harder puzzle is required. Defaults to False.
+
     Returns:
-        List[str]: List of all possible cross concatenations.
+        str: Returns puzzle string.
     """
-    return [r + c for r in row for c in col]
-
-
-def chunk_string_by_len(string: str, n: int = 3) -> List[str]:
-    """This function returns chunks of strings of length n
-    Args:
-        string (str): Any String
-        n (int): Length of chunk
-    Returns:
-        List[str]: List of all possible chunks
-    """
-    return [string[i:i+n] for i in range(0, len(string), n)]
-
+    if complex:
+        return '4.....8.5.3..........7......2.....6.....8.4......1.......6.3.7.5..2.....1.4......'
+    
+    return '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
 
 def grid_values(puzzle:str,boxes:List[str],replace:bool=True) -> Dict[str,str]:
     """This function maps each puzzle unit to its box unit.
@@ -142,18 +139,23 @@ def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[s
         unit_values_sum = sum([int(grids.get(k)) for k in unit])
         solved = unit_values_sum == 45
     return grids,solved
+
+def search(values:Dict[str,str],unit_list:List[List[str]]=unit_list):
+    "Using depth-first search and propagation, create a search tree and solve the sudoku."
+    # First, reduce the puzzle using the previous function
+    values = reduce_puzzle(values, unit_list)
+    print(values)
+    # Choose one of the unfilled squares with the fewest possibilities
+    
+    # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
+
+    # If you're stuck, see the solution.py tab!
   
 def main(display_units:bool=False):
     """This is the main function to do all the main functionalities.
     Args:
         display_units (bool, optional): A option to display units. Defaults to False.
     """
-    boxes = cross(ROWS, COLS)
-    
-    row_units = [cross(r,COLS) for r in ROWS]
-    col_units = [cross(ROWS,c) for c in COLS]
-    square_units = [cross(r,c) for r in chunk_string_by_len(ROWS) for c in chunk_string_by_len(COLS)]
-    unit_list = row_units + col_units + square_units
     
     if display_units:
         print(f"boxes : \n{boxes}\n")
@@ -161,12 +163,13 @@ def main(display_units:bool=False):
         print(f"col_units : \n{col_units}\n")
         print(f"square_units : \n{square_units}\n")
         print(f"unit_lists : \n{unit_list}\n")
-    
-    puzzle = '..3.2.6..9..3.5..1..18.64....81.29..7.......8..67.82....26.95..8..2.3..9..5.1.3..'
+        
+    # get puzzle
+    puzzle = get_puzzle(complex=True)
     print("\nUnsolved Sudoku.")
     display_sudoku(grid_values(puzzle,boxes,replace=False)) #display original
     
-    print("\nSudoku with replaced dots.")
+    print("\nSudoku with replaced dots by 1-9.")
     grid_units = grid_values(puzzle,boxes)
     display_sudoku(grid_units) #display replaced
     
@@ -181,6 +184,10 @@ def main(display_units:bool=False):
     print("\nSudoku after Constraint Propagation.")
     reduced_puzzle_values,solved=reduce_puzzle(eliminated_values,unit_list)
     display_sudoku(reduced_puzzle_values)
+    
+    print("\nSudoku after Search.")
+    solved_puzzle_with_search=search(eliminated_values,unit_list)
+    # display_sudoku(reduced_puzzle_values)
     
     print(f'The SUDOKU is {"Solved" if solved else "UnSolved"}.')
     
