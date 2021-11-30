@@ -134,23 +134,36 @@ def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[s
         grids = only_choice(grids, unit_list)
         solved_values_after = len([value for value in grids.values() if len(value)==1])#total units with single value
         stalled = solved_values_before == solved_values_after
-        
-    for unit in unit_list:
-        unit_values_sum = sum([int(grids.get(k)) for k in unit])
-        solved = unit_values_sum == 45
-    return grids,solved
+        if len([box for box in grids.keys() if len(grids[box]) == 0]):
+            return False 
+    return grids
 
-def search(values:Dict[str,str],unit_list:List[List[str]]=unit_list):
+def search(values:Dict[str,str],unit_list:List[List[str]]=unit_list)->Dict[str,str]:
     "Using depth-first search and propagation, create a search tree and solve the sudoku."
     # First, reduce the puzzle using the previous function
     values = reduce_puzzle(values, unit_list)
-    print(values)
+    if values is False:
+        return False ## Failed earlier
+    if all(len(values[s]) == 1 for s in boxes): 
+        return values ## Solved!
     # Choose one of the unfilled squares with the fewest possibilities
     
+    # checks min values with in the list of tuples
+    n,k =  min((len(v),k) for k,v in values.items() if len(v)>1)
     # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
+    for value in values[k]:
+        new_sudoku=values.copy()
+        new_sudoku[k]=value
+        attempt = search(new_sudoku,)
+        if attempt:
+            return attempt
+        
+def check_if_sudoku_solved(grids:Dict[str,str]) -> bool:
+    for unit in unit_list:
+        unit_values_sum = sum([int(grids.get(k)) for k in unit])
+        solved = unit_values_sum == 45
+    return solved
 
-    # If you're stuck, see the solution.py tab!
-  
 def main(display_units:bool=False):
     """This is the main function to do all the main functionalities.
     Args:
@@ -182,13 +195,17 @@ def main(display_units:bool=False):
     display_sudoku(elimination_with_only_coices_values)
     
     print("\nSudoku after Constraint Propagation.")
-    reduced_puzzle_values,solved=reduce_puzzle(eliminated_values,unit_list)
+    reduced_puzzle_values=reduce_puzzle(eliminated_values,unit_list)
     display_sudoku(reduced_puzzle_values)
     
-    print("\nSudoku after Search.")
-    solved_puzzle_with_search=search(eliminated_values,unit_list)
-    # display_sudoku(reduced_puzzle_values)
-    
+    solved = check_if_sudoku_solved(reduced_puzzle_values)
+    if not solved:
+        print("\nThe SUDOKU is UnSolved and needs searching.")
+        print("Sudoku after Search.")
+        solved_puzzle_with_search=search(eliminated_values)
+        display_sudoku(solved_puzzle_with_search)
+        solved = check_if_sudoku_solved(solved_puzzle_with_search) 
+        
     print(f'The SUDOKU is {"Solved" if solved else "UnSolved"}.')
     
 if __name__ == "__main__":
