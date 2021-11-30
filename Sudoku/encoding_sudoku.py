@@ -64,11 +64,10 @@ def display_sudoku(p_values:Dict[str,str])  -> None:
             pt='-'*(max_len*3) #tern
             print('+'.join([pt,pt,pt]),'\n')
             
-def find_peers(box:str,unit_list:List[List[str]]) -> List[str]:
+def find_peers(box:str) -> List[str]:
     """This function returns the peers of box.
     Args:
         box (str): A box unit
-        unit_list (LList[List[str]]): A list of units
     
     Returns:
         List[str]: A List of peers for the given box.
@@ -78,32 +77,30 @@ def find_peers(box:str,unit_list:List[List[str]]) -> List[str]:
     peers = list(set([item for sub_list in peers_list for item in sub_list if item !=box]))
     return peers
      
-def eliminate(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
+def eliminate(grids:Dict[str,str]) -> Dict[str,str]:
     """This function eliminates values from temporary box units(with values 1-9) if 
        that is present in single valued peers of that box.
     Args:
         grids (Dict[str,str]): A dictionary of sudoku box units
-        unit_list (List[List[str]]): A list of units
-    
+        
     Returns:
         grids (Dict[str,str]): A dictionary of sudoku box units with eliminated values.
     """
     for key,value in grids.items():
         if len(value) > 1:
-            peers = find_peers(key,unit_list)
+            peers = find_peers(key)
             peers_values = [grids.get(k) for k in peers if len(grids.get(k))==1]
             for v in peers_values:
                 value=value.replace(v,"")
             grids[key]=value
     return grids
 
-def only_choice(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
+def only_choice(grids:Dict[str,str]) -> Dict[str,str]:
     """This function replaces eliminated box units with only choice value
        with in the unit.
 
     Args:
         grids (Dict[str,str]): A dictionary of sudoku box units
-        unit_list (List[List[str]]): A list of units
 
     Returns:
         grids (Dict[str,str]): A dictionary of sudoku box units with replacing only values.
@@ -115,12 +112,11 @@ def only_choice(grids:Dict[str,str],unit_list:List[List[str]]) -> Dict[str,str]:
                 grids[d_places[0]] = digit
     return grids
     
-def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[str,str],bool]:
+def reduce_puzzle(grids:Dict[str,str]) -> Union[Dict[str,str],bool]:
     """This function reduces unsolved box units to single value with repeated elimination and reduction.
 
     Args:
         grids (Dict[str,str]): A dictionary of sudoku box units
-        unit_list (List[List[str]]): A list of units
 
     Returns:
         grids (Dict[str,str]): A dictionary of sudoku box units with replacing only values.
@@ -130,26 +126,27 @@ def reduce_puzzle(grids:Dict[str,str],unit_list:List[List[str]]) -> Union[Dict[s
     solved = False
     while not stalled:
         solved_values_before = len([value for value in grids.values() if len(value)==1])#total units with single value
-        grids = eliminate(grids, unit_list)
-        grids = only_choice(grids, unit_list)
+        grids = eliminate(grids)
+        grids = only_choice(grids)
         solved_values_after = len([value for value in grids.values() if len(value)==1])#total units with single value
         stalled = solved_values_before == solved_values_after
         if len([box for box in grids.keys() if len(grids[box]) == 0]):
             return False 
     return grids
 
-def search(values:Dict[str,str],unit_list:List[List[str]]=unit_list)->Dict[str,str]:
+def search(values:Dict[str,str])->Dict[str,str]:
     "Using depth-first search and propagation, create a search tree and solve the sudoku."
     # First, reduce the puzzle using the previous function
-    values = reduce_puzzle(values, unit_list)
+    values = reduce_puzzle(values)
     if values is False:
         return False ## Failed earlier
     if all(len(values[s]) == 1 for s in boxes): 
         return values ## Solved!
-    # Choose one of the unfilled squares with the fewest possibilities
     
+    # Choose one of the unfilled squares with the fewest possibilities
     # checks min values with in the list of tuples
     n,k =  min((len(v),k) for k,v in values.items() if len(v)>1)
+    
     # Now use recursion to solve each one of the resulting sudokus, and if one returns a value (not False), return that answer!
     for value in values[k]:
         new_sudoku=values.copy()
@@ -187,15 +184,15 @@ def main(display_units:bool=False):
     display_sudoku(grid_units) #display replaced
     
     print("\nSudoku with eliminated values.")
-    eliminated_values=eliminate(grid_units,unit_list)
+    eliminated_values=eliminate(grid_units)
     display_sudoku(eliminated_values) #display eliminated
     
     print("\nSudoku after replacing with only choices.")
-    elimination_with_only_coices_values=only_choice(eliminated_values,unit_list)
+    elimination_with_only_coices_values=only_choice(eliminated_values)
     display_sudoku(elimination_with_only_coices_values)
     
     print("\nSudoku after Constraint Propagation.")
-    reduced_puzzle_values=reduce_puzzle(eliminated_values,unit_list)
+    reduced_puzzle_values=reduce_puzzle(eliminated_values)
     display_sudoku(reduced_puzzle_values)
     
     solved = check_if_sudoku_solved(reduced_puzzle_values)
